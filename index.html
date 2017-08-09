@@ -1,51 +1,144 @@
-Jenkins+git+webhook自动触发部署和测试任务
-
- 144
-作者 萩茝
-2016.03.04 18:27* 字数 986
-需求：
-目前上线前会将需要上线的代码push到release分支，然后由人工填写参数点击触发jenkins上的任务。希望这个过程能完成自动化，只要有人往release上推代码，就自动跑部署release分支并测试
-
-解决办法及步骤：
-
-1.在jenkins里需要自动触发的job里的“源码管理”部分添加设置，如下图。填好git仓库url和需要检测的分支名称
-
-
-注意事项：
-
-a.在填url的时候可能会提示找不到命令的错误，遇到这个错的解决办法是去jenkins系统管理->系统设置，找到git设置部分，在Path to Git executable里填上git的路径，这个路径在服务器上执行命令which git可得到。
-
-b.还有可能遇到的是报Permission denied这样的错误。这是由于jenkins运行时所用的系统用户没有访问git仓库权限导致的。需要在运行jenkins的用户目录下生成git的公钥和私钥，并将owner改成该用户。
-
-2.在jenkins需要触发的job里“构建触发器”部分勾选Poll SCM，但里面什么都不填。
-
-如果填则是填crontab那种格式的命令。填了的话就是让它每隔一段时间去检查下源码管理里所设置的git仓库里的分支有没有更新，有更新则触发该job,没更新则不触发。这样设置的缺点是检查得如果太过频繁，是对网络资源的浪费，但是检查时间隔得太长触发又不及时。
-
-而且使用过程中有个问题，就是比如5分钟检查一次，第一次检查的时候检测到有更新，于是执行job，这个job执行的时间比较长超过了检查时间5分钟，那下一次检查的时候，由于这个job还正在运行中，则它还会认为这更新没有被job执行，如此便会再次触发job。只有在触发的job执行完时，它才知道这个更新是被这个构建执行过的，不用再触发了。
-
-所以官方上也并不推荐这种方法，推荐的是远程触发的方式，比如用git的post-receive钩子触发，只要在钩子里写上这句即可。
-
-curl http://yourserver/git/notifyCommit?url=[&branches=branch1[,branch2]*][&sha1=]
-
-由于我们的项目用的是gitLab,然后gitLab有个webhook可以用。原理上跟post-receive钩子是差不多的。
-
-3.在Jenkins里装一个插件https://wiki.jenkins-ci.org/display/JENKINS/Gitlab+Hook+Plugin
-
-看名字就知道这个插件是为了配合gitLab用的
-
-4.在gitLab项目中添加web hook(Project Settings --> WebHooks)
-
-
-
-
-gitlab的web hook有很多种，可以满足不同的需求，因为我们的需求是push代码的时候触发，所以选的是Push events.
-
-Url的作用:这个地方填的url是gitlab发请求用的。其实它的原理就是当开发人员在git上的操作触发这个hook时，gitlab就向这个url发一个post请求。请求中带着一堆参数比如提交者是谁，提交的分支是哪个，commit号是多少等等。接受这个请求的那端可以利用这些信息去处理后续的一些事情，比如部署测试通知等等。
-
-此处，由于我们在jenkins上安装了gitlab hook插件，所以我们只需要按照它的使用方法在url里填上以下链接即可：
-
-http://your-jenkins-server/gitlab/notify_commit
-
-效果：
-
-有人release上提交代码后，就会自动触发jenkins上的任务。push到别的分支是不会触发的。
+<html>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <head>
+ <link href="//cdn.staticfile.org/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet">
+ <link rel="apple-touch-icon-precomposed" href="v3/apple-touch-icon-57-precomposed.png">
+	<link rel="shortcut icon" href="http://www.runoob.com/favicon.ico">
+	<script type="text/javascript" src="//cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript" src="//cdn.staticfile.org/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="//cdn.staticfile.org/jqueryui-touch-punch/0.2.2/jquery.ui.touch-punch.min.js"></script>
+	<script type="text/javascript" src="//cdn.staticfile.org/twitter-bootstrap/3.0.1/js/bootstrap.min.js"></script>
+ </head>
+ <body>
+  <div class="container">
+	<div class="row clearfix">
+		<div class="col-md-4 column">
+			<h2>
+				c#
+			</h2>
+			<p>
+				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+			</p>
+			<p>
+				 <a class="btn" href="#">View details »</a>
+			</p>
+		</div>
+		<div class="col-md-4 column">
+			<h2>
+				<div class="title">
+					Web API
+				</div>
+			</h2>
+			<p>
+				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+			</p>
+			<p>
+				 <a class="btn" href="#">View details »</a>
+			</p>
+		</div>
+		<div class="col-md-4 column">
+			<h2>
+				<div class="title">
+					ASP.NET MVC
+				</div>
+			</h2>
+			<p>
+				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+			</p>
+			<p>
+				 <a class="btn" href="#">View details »</a>
+			</p>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-4 column">
+			<h2>
+				Heading
+			</h2>
+			<p>
+				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+			</p>
+			<p>
+				 <a class="btn" href="#">View details »</a>
+			</p>
+		</div>
+		<div class="col-md-4 column">
+			<h2>
+				Heading
+			</h2>
+			<p>
+				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+			</p>
+			<p>
+				 <a class="btn" href="#">View details »</a>
+			</p>
+		</div>
+		<div class="col-md-4 column">
+			<h2>
+				Heading
+			</h2>
+			<p>
+				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+			</p>
+			<p>
+				 <a class="btn" href="#">View details »</a>
+			</p>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="row">
+				<div class="col-md-4">
+					<div class="thumbnail">
+						<img alt="300x200" src="v3/default4.jpg" />
+						<div class="caption">
+							<h3>
+								Thumbnail label
+							</h3>
+							<p>
+								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+							</p>
+							<p>
+								 <a class="btn btn-primary" href="#">Action</a> <a class="btn" href="#">Action</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="thumbnail">
+						<img alt="300x200" src="v3/default5.jpg" />
+						<div class="caption">
+							<h3>
+								Thumbnail label
+							</h3>
+							<p>
+								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+							</p>
+							<p>
+								 <a class="btn btn-primary" href="#">Action</a> <a class="btn" href="#">Action</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="thumbnail">
+						<img alt="300x200" src="v3/default6.jpg" />
+						<div class="caption">
+							<h3>
+								Thumbnail label
+							</h3>
+							<p>
+								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+							</p>
+							<p>
+								 <a class="btn btn-primary" href="#">Action</a> <a class="btn" href="#">Action</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+ </body>
+</html>
