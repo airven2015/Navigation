@@ -3,7 +3,7 @@ layout: post
 title: "Migrating To Octopress"
 date: 2014-02-13 23:07:02 +0530
 comments: true
-categories: 
+categories: c#
 ---
 
 Finally after much ado, I am moving Gotchacode to Octopress. There are various reasons for doing it.

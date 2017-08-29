@@ -1,68 +1,66 @@
 <header class="header">
-	<div class="header-container">
-		<div class="nav">
-			{% if page.path == "index.html" %}
-			<span class="title">
+    <div class="header-container">
+        <div class="nav">
+            {% if page.path == "index.html" %}
+            <span class="title">
 				<li>
-					<a href="/index.html">home</a>
+					<a href="website/index.html">首页</a>
 				</li>
-			</span>			
-			{% else %}
+			</span> {% else %}
+            <li>
+                <a href="website/index.html">首页</a>
+            </li>
+            {% endif %} {% if page.path == "archive.html" %}
+            <span class="title">
 				<li>
-					<a href="/index.html">home</a>
-				</li>			
-			{% endif %}
-			{% if page.path == "archive.html" %}
-			<span class="title">
-				<li>
-					<a href="/archive.html">archive</a>
+					<a href="website/archive.html">文章</a>
 				</li>
-			</span>			
-			{% else %}
+			</span> {% else %}
+            <li>
+                <a href="website/archive.html">文章</a>
+            </li>
+            {% endif %} {% if page.path == "category.html" %}
+            <span class="title">
 				<li>
-					<a href="/archive.html">archive</a>
-				</li>			
-			{% endif %}
-			{% if page.path == "category.html" %}
-			<span class="title">
-				<li>
-					<a href="/category.html">category</a>
+					<a href="website/category.html">分类</a>
 				</li>
-			</span>			
-			{% else %}
+			</span> {% else %}
+            <li>
+                <a href="website/category.html">分类</a>
+            </li>
+            {% endif %} {% if page.path == "about.html" %}
+            <span class="title">
 				<li>
-					<a href="/category.html">category</a>
-				</li>			
-			{% endif %}
-			{% if page.path == "about.html" %}
-			<span class="title">
-				<li>
-					<a href="/about.html">about</a>
+					<a href="website/about.html">关于</a>
 				</li>
-			</span>			
-			{% else %}
+			</span> {% else %}
+            <li>
+                <a href="website/about.html">关于</a>
+            </li>
+            {% endif %}
+            <span class="title">
 				<li>
-					<a href="/about.html">about</a>
-				</li>			
-			{% endif %}
-		</div>
-		<div class="description"> {{ site.motto }} </div>		
-		<ul class="social-links">
-			<li>
-				<a href="https://github.com/{{ site.github_username }}" title="Github">
-					<img width="19px" height="19px" src="/images/github.png"/>
-				</a>
-			</li>
-			<li>
-				<a href="/feed.xml" title="RSS">
-					<img width="19px" height="19px" src="/images/rss.png"/>
-				</a>
-			</li>
-			<li>
-				<a href="https://twitter.com/{{ site.twitter_username }}" title="Twitter">
-					<img width="19px" height="19px" src="/images/twitter.png"/>
-				</a>
-			</li>
-		</ul>		
-	</div>
+					<a href="website/navigate.html">我的导航</a>
+				</li>
+			</span>
+        </div>
+        <div class="description"> {{ site.motto }} </div>
+        <ul class="social-links">
+            <li>
+                <a href="https://github.com/{{ site.github_username }}" title="Github">
+                    <img width="19px" height="19px" src="website/images/github.png" />
+                </a>
+            </li>
+            <li>
+                <a href="website/feed.xml" title="RSS">
+                    <img width="19px" height="19px" src="website/images/rss.png" />
+                </a>
+            </li>
+            <li>
+                <a href="https://twitter.com/{{ site.twitter_username }}" title="Twitter">
+                    <img width="19px" height="19px" src="website/images/twitter.png" />
+                </a>
+            </li>
+        </ul>
+    </div>
 </header>
