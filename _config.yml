@@ -16,4 +16,7 @@ github_username:  jekyll
 markdown: kramdown
 =======
 theme: jekyll-theme-cayman
+plugins: ['jekyll-paginate', 'jekyll-gist']
+paginate: 5
+paginate_path: "page:num"
 >>>>>>> 67dc215c36276572f9e550170e992e1f48dff65c
