@@ -28,7 +28,16 @@
             <li>
                 <a href="/website/category.html">分类</a>
             </li>
-            {% endif %} {% if page.path == "about.html" %}
+            {% endif %} {% if page.path == "navigate.html" %}
+            <span class="title">
+				<li>
+				<a href="/website/navigate.html">我的导航</a>
+				</li>
+			</span> {% else %}
+            <li>
+                <a href="/website/navigate.html">我的导航</a>
+            </li>
+            {% endif %} {% endif %} {% if page.path == "about.html" %}
             <span class="title">
 				<li>
 					<a href="/website/about.html">关于</a>
@@ -38,11 +47,6 @@
                 <a href="/website/about.html">关于</a>
             </li>
             {% endif %}
-            <span class="title">
-				<li>
-					<a href="/website/navigate.html">我的导航</a>
-				</li>
-			</span>
         </div>
         <div class="description"> {{ site.motto }} </div>
         <ul class="social-links">
