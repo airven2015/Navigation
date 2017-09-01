@@ -1,9 +1,9 @@
 --- 
 layout: post
-title: "How to Set up A Website With Your Git Work Flow"
-description: "Guide to setup readonly mode for some users in django admin"
+title: "2017-09-01-about markdown instruction"
+description: "2017-09-01-about markdown instruction"
 category: articles
-tags: [python, django]
+tags: [人生]
 comments: false
 ---
 
