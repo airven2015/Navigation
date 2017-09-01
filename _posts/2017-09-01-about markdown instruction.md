@@ -1,15 +1,11 @@
 --- 
 layout: post
-title: "2017-09-01-about markdown instruction"
-description: "2017-09-01-about markdown instruction"
+title: "about markdown instruction"
+description: "Markdown document in **StackEdit**[^stackedit]"
 category: articles
 tags: [人生]
 comments: false
 ---
-
-Welcome to StackEdit!
-===================
-
 
 Hey! I'm your first Markdown document in **StackEdit**[^stackedit]. Don't delete me, I'm very helpful! I can be recovered anyway in the **Utils** tab of the <i class="icon-cog"></i> **Settings** dialog.
 
