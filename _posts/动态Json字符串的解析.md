@@ -1,0 +1,220 @@
+--- 
+title: "动态Json字符串的解析" 
+layout:post
+uuid: "9145267946233853613" 
+guid: "tag:blogger.com,1999:blog-8151684071475042498.post-9145267946233853613" 
+date: 2014-01-12 08:29:00
+comments: "0" 
+categories: [c#,.net]
+---
+* 对于传统的Json字符串，比如有规定属性的对象，通常都会采用反序列化的方式就可以了，例如下面的方式：
+```csharp
+ DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+ MemoryStream ms = newMemoryStream(Encoding.UTF8.GetBytes(jsonString));
+ T obj = (T)ser.ReadObject(ms); 
+```
+但是有时候会出现动态的json字符串，例如：
+```json
+{
+  "workOrderId": "WO170330000375",
+  "workOrderData": {
+    "workOrderId": "WO170330000376",
+    "statusDesc": "执行中",
+    "modifyUserId": "system",
+    "modifyUserName": "system"
+  },
+  "formData": {
+    "id": "WO170330000377",
+    "data": {
+      "dbTypes_text": [
+        "SqlServer",
+        "MySql"
+      ],
+      
+    }
+  },
+  "approvalLogs": [
+    {
+      "workOrderId": "WO170330000379",
+      "remark": "同意",
+      "createTime": {
+        "date": 30,
+        "hours": 17,
+        "seconds": 32
+      }
+    },
+    {
+      "workOrderId": "WO170330000380",
+      "remark": "同意",
+      "createTime": {
+        "date": 30,
+        "hours": 17,
+        "seconds": 46
+      }
+    }
+  ]
+}
+```
+### 解析上述字符串
+>需要引用第三方类库 <Newtonsoft.Json>
+
+#### 取workOrderId值
+```csharp
+var jsonobject = JsonConvert.DeserializeObject<JObject>(strJson);
+Console.WriteLine(jsonobject["workOrderId"]);
+```
+#### 判断节点中是否存在某个元素
+```
+JObject jo = JObject.Parse(strJson);
+if (jo.Properties().Any(p => p.Name == "workOrderId"))
+    Console.WriteLine("true");
+```
+
+#### 采用JProperty来获取
+```csharp
+IEnumerable<JProperty> properties = jo.Properties();
+foreach (JProperty item in properties)
+{
+    if (item.Name.Equals("workOrderId"))
+    {
+        Console.WriteLine(item.Name + ":" + item.Value);
+    }
+}
+```
+#### 取modifyUserId值
+```csharp
+var node = jo["workOrderData"]["modifyUserId"];
+Console.WriteLine(node.ToString());
+
+//或者
+var childss = jo["workOrderData"] as JObject;
+foreach (var prip in childss.Properties())
+{
+    Console.WriteLine("key:" + (prip.Name + "  values:" + (prip.Value)));
+}
+
+//或者
+var childs = jo["workOrderData"].Children();
+IEnumerator enumerator = childs.GetEnumerator();
+while (enumerator.MoveNext())
+{
+    if (enumerator.Current != null)
+    {
+        var jtoken = (JToken)enumerator.Current;
+        if (((JProperty)jtoken).Name.Equals("modifyUserId"))
+            Console.WriteLine("key:" + ((JProperty)jtoken).Name + "  values:" + ((JProperty)jtoken).Value);
+    }
+}
+```
+#### 取approvalLogs下的remark值
+```csharp
+var arra = (JArray)jo["approvalLogs"];//JArray.Parse(jo["approvalLogs"].ToString());
+foreach (var item in arra)
+{
+    Console.WriteLine(((JObject)item).GetValue("remark"));
+}
+//或者
+var nodes = jo["approvalLogs"].Children();
+foreach (var log in nodes)
+{
+    Console.WriteLine(((JObject)log)["remark"]);
+}
+//或者
+foreach (var log in nodes)
+{
+    Console.WriteLine(((JObject)log).Property("remark").Value.ToString());
+}
+```
+
+#### 取formData下的dbTypes_text的值
+```csharp
+var data = (jo["formData"] as JObject).GetValue("data");
+var result = ((JObject)data)["dbTypes_text"];
+foreach (var item in JArray.Parse(result.ToString()))// (JArray)result
+{
+Console.WriteLine(item);
+}
+//或者
+var values = result.Children().Values();
+foreach (var obj in values)
+{
+Console.WriteLine(obj.ToString());
+}
+Console.Read();
+```
+
+#### 递归调用获取节点的方法
+```csharp
+    private string GetJsonValue(JToken jToken, string key)
+        {
+            var value = string.Empty;
+            if (!(jToken is JObject)) return value;
+            var jobj = ((JObject)jToken).Property(key);
+            if (jobj == null)
+            {
+                if (jToken is JObject || (jToken is JProperty && ((JProperty)jToken).Value is JObject))
+                {
+                    if (jToken.Children().Count() > 0)
+                    {
+                        value = GetJsonValue(jToken.Children(), key);
+                    }
+                }
+                if (string.IsNullOrWhiteSpace(value) && jToken is JProperty)
+                {
+                    if (((JProperty)jToken).Name == key)
+                    {
+                        value = ((JProperty)jToken).Value.ToString();
+                    }
+                }
+            }
+
+            else
+            {
+                value = jToken[key].ToString();
+            }
+            return value;
+        }
+        private string GetJsonValue(JEnumerable<JToken> jToken, string key)
+        {
+            var value = string.Empty;
+            IEnumerator enumerator = jToken.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                if (enumerator.Current != null)
+                {
+                    var current = enumerator.Current;
+
+                    JToken jc = (JToken)current;
+                    if (jc is JObject || (jc is JProperty && ((JProperty)jc).Value is JObject))
+                    {
+                        if (jc.Children().Count() > 0)
+                        {
+                            value = GetJsonValue(jc.Children(), key);
+                        }
+                    }
+                    if (string.IsNullOrWhiteSpace(value) && jc is JProperty)
+                    {
+                        if (((JProperty)jc).Value is JArray)
+                        {
+                            var ja = (JArray)((JProperty)jc).Value;
+                            foreach (var j in ja)
+                            {
+
+                                value = GetJsonValue(j, key);
+                                if (!string.IsNullOrWhiteSpace(value))
+                                    break;
+                            }
+                        }
+                        if (((JProperty)jc).Name == key && string.IsNullOrWhiteSpace(value))
+                        {
+                            value = ((JProperty)jc).Value.ToString();
+                        }
+                    }
+
+                }
+                if (!string.IsNullOrWhiteSpace(value))
+                    break;
+            }
+            return value;
+        }
+```
